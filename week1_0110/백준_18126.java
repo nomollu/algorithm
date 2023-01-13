@@ -3,57 +3,46 @@ package silver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
-public class S17503_beerFestival {
-	static int N, M, K;
-	static Beer[] beers;
-	static boolean[] visit;
+public class S18126_raccoonGugu {
+	static int N;
+	static List<Node>[] nodes;
 	
-	static class Beer implements Comparable<Beer>{
-		int like, alcohol;
-		Beer(int like, int alcohol){
-			this.like = like;
-			this.alcohol = alcohol;
+	static class Node{
+		int to, dis;
+		Node(int to, int dis){
+			this.to = to;
+			this.dis = dis;
 		}
-		@Override
-		public int compareTo(Beer o) {
-			if(this.alcohol == o.alcohol) return o.like-this.like; //내림차순
-			else return this.alcohol-o.alcohol; //오름차순
-		}
-		
-	}
-	//start:조합 시작인덱스, cnt:마신 횟수, sum:누적 선호도
-	static int dfs(int start, int cnt, int sum_l, int max_a){ 
-		if(cnt==N) {
-			if(sum_l >= M) return max_a;
-			else return -1;
-		}
-		for(int i=start; i<K; i++) {
-			int result = dfs(i+1, cnt+1, sum_l+beers[i].like, Math.max(max_a, beers[i].alcohol));
-			if(result!=-1) return result;
-		}
-		return -1;
 	}
 	
-	public static void main(String[] args) throws IOException{
+	static long dfs(int from, int to, long sum) {
+		long max = sum;
+		for(Node now : nodes[to]) {
+			if(now.to == from) continue;
+			max = Math.max(max, dfs(to, now.to, sum+now.dis));
+		}
+		return max;
+	}
+	
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		
-		beers = new Beer[K];
-		visit = new boolean[K];
-		
-		for(int i=0; i<K; i++) {
-			st = new StringTokenizer(br.readLine());
-			beers[i] = new Beer(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+		N = Integer.parseInt(br.readLine());
+		nodes = new List[N+1];
+		for(int i=1; i<=N; i++) nodes[i] = new ArrayList<Node>();
+		for(int i=0; i<N-1; i++) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			int d = Integer.parseInt(st.nextToken());
+			nodes[a].add(new Node(b, d));
+			nodes[b].add(new Node(a, d));
 		}
 		
-		Arrays.sort(beers);
-		System.out.println(dfs(0, 0, 0, 0));
+		System.out.println(dfs(-1, 1, 0));
 	}
 
 }
