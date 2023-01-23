@@ -3,7 +3,7 @@ package silver;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class S17503_beerFestival {
@@ -24,19 +24,7 @@ public class S17503_beerFestival {
 		}
 		
 	}
-	//start:조합 시작인덱스, cnt:마신 횟수, sum_l:누적 선호도, max_a:알코올 최댓값
-	static int dfs(int start, int cnt, int sum_l, int max_a){ 
-		if(cnt==N) {
-			if(sum_l >= M) return max_a; // 기준선호도 넘을 경우만 값 반환
-			else return -1;
-		}
-		for(int i=start; i<K; i++) {
-			int result = dfs(i+1, cnt+1, sum_l+beers[i].like, Math.max(max_a, beers[i].alcohol));
-			if(result!=-1) return result;
-		}
-		return -1;
-	}
-	
+
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
@@ -47,13 +35,31 @@ public class S17503_beerFestival {
 		beers = new Beer[K];
 		visit = new boolean[K];
 		
+		PriorityQueue<Beer> beers = new PriorityQueue<Beer>();
 		for(int i=0; i<K; i++) {
 			st = new StringTokenizer(br.readLine());
-			beers[i] = new Beer(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+			beers.add(new Beer(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())));
 		}
 		
-		Arrays.sort(beers);
-		System.out.println(dfs(0, 0, 0, 0));
+		int sum_l=0, max_a=-1, cnt=0;
+		PriorityQueue<Integer> eaten = new PriorityQueue<Integer>();
+		
+		while(!beers.isEmpty()) {
+			Beer b = beers.poll();
+			sum_l += b.like;
+			eaten.add(b.like);
+		
+			if(++cnt==N) {
+				if(sum_l>=M) {
+					max_a = b.alcohol;
+					break;
+				}else {
+					cnt--;
+					sum_l -= eaten.poll();
+				}
+			}
+		}
+		System.out.println(max_a);
 	}
 
 }
