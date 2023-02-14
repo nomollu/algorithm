@@ -1,6 +1,7 @@
 var fs = require('fs'); 
 var input = fs.readFileSync('input.txt').toString().trim().split('\n');
 
+
 function count_len(K, Q) {
     let len = 0;
 
