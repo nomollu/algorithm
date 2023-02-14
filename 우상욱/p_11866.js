@@ -5,6 +5,7 @@ let N = Number(input[0].split(' ')[0]), K = Number(input[0].split(' ')[1]);
 let sequence = [];
 let table = [];
 
+
 // init table
 for(let i = 1; i <= N; i++) table.push(i);
 
