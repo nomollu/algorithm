@@ -42,7 +42,6 @@ public class bj4179_불 {
                 if(map[i][j] == 'J'){
                     x = i;
                     y = j;
-                    //map[i][j] = '.';
                 }
                 // 불일 경우
                 if(map[i][j] == 'F'){
@@ -68,13 +67,35 @@ public class bj4179_불 {
         Queue<Point> queue = new LinkedList<>(); // 지훈의 위치 큐
         queue.add(new Point(x,y, 1)); // 지훈 초기 위치 및 시간 설정
         boolean[][] visited = new boolean[R][C]; // 지훈의 방문 체크 배열
+        visited[x][y] = true;
 
         // BFS
         while (!queue.isEmpty()){
 
             // 지훈이의 새 위치
-            Point point = queue.poll();
-            visited[point.x][point.y] = true;
+            int size = queue.size();
+            for(int s = 0 ; s < size ; s++){
+                Point point = queue.poll();
+                if(map[point.x][point.y] == 'F'){
+                    continue;
+                }
+
+                // 지훈이가 이동 가능한 새 위치 탐색
+                for(int d = 0 ; d < 4 ; d++){
+                    int nX = point.x + di[d];
+                    int nY = point.y + dj[d];
+
+                    if(isValid(nX, nY) && !visited[nX][nY]) {
+                        queue.add(new Point(nX, nY,  point.time + 1));
+                        visited[nX][nY] = true;
+                    }
+                }
+
+                // 지훈이가 탈출 가능한가?
+                if(isBreak(point.x,point.y)){
+                    ans = Math.min(ans, point.time);
+                }
+            }
 
             // 불 확산
             Queue<Point> newFires = new LinkedList<>();
@@ -91,26 +112,7 @@ public class bj4179_불 {
                 }
             }
             fires = new LinkedList<>(newFires);
-
-            showMap(map, point);
-
-            // 지훈이가 탈출 가능한가?
-            if(isBreak(point.x,point.y)){
-                ans = Math.min(ans, point.time);
-                continue; // 여기서 새 위치를 탐색하는 것은 어차피 시간이 더 걸리는 행위므로
-            }
-
-            // 지훈이가 이동 가능한 새 위치 탐색
-            for(int d = 0 ; d < 4 ; d++){
-                int nX = point.x + di[d];
-                int nY = point.y + dj[d];
-
-                if(isValid(nX, nY) && !visited[nX][nY]) {
-                    queue.add(new Point(nX, nY,  point.time + 1));
-                }
-            }
         }
-
     }
 
     public static boolean isValid(int x, int y){
@@ -119,19 +121,5 @@ public class bj4179_불 {
 
     public static boolean isBreak(int x, int y){
         return x == 0 || x == R-1 || y == 0 || y == C-1;
-    }
-
-
-    public static void showMap(char[][] map, Point point){
-        System.out.println("\n==========");
-        System.out.println("* 위치 : (" + point.x + "," + point.y + ")");
-        System.out.println("* 시간 : " + point.time);
-        for(int i = 0 ; i < map.length ; i++){
-            for(int j = 0 ; j < map[i].length ; j++){
-                System.out.print(map[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println("==========");
     }
 }
