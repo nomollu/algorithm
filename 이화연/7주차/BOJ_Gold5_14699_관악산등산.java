@@ -2,13 +2,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class BOJ_Gold5_14699_관악산등산 {
 	static int N, M, height[], ans[];
 	static ArrayList<Integer>[] list;
+	static PriorityQueue<Shelter> queue;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -18,10 +18,12 @@ public class BOJ_Gold5_14699_관악산등산 {
 		height = new int[N + 1];
 		ans = new int[N + 1];
 		list = new ArrayList[N + 1];
+		queue = new PriorityQueue<>();
 
 		st = new StringTokenizer(br.readLine());
 		for (int i = 1; i <= N; i++) {
 			height[i] = Integer.parseInt(st.nextToken());
+			queue.add(new Shelter(height[i], i));
 			list[i] = new ArrayList<>();
 		}
 
@@ -36,12 +38,16 @@ public class BOJ_Gold5_14699_관악산등산 {
 			}
 		}
 
-		for (int i = 1; i <= N; i++) {
-			if (list[i].size() == 0) { // 만약 연결된게 없으면 현재 쉼터보다 높은 쉼터가 없음
-				ans[i] = 1;
-			} else {
-				bfs(i);
+		// 높은 곳에서 내려오면서 갈 수 있는 곳 탐색
+		while (!queue.isEmpty()) {
+			Shelter now = queue.poll();
+			int cnt = 0;
+
+			// 연결된 곳 탐색하면서 최댓값 갱신
+			for (int next : list[now.index]) {
+				cnt = Math.max(cnt, ans[next]);
 			}
+			ans[now.index] = cnt + 1;
 		}
 
 		for (int i = 1; i <= N; i++) {
@@ -49,36 +55,18 @@ public class BOJ_Gold5_14699_관악산등산 {
 		}
 	}
 
-	static void bfs(int num) {
-		Queue<Shelter> queue = new LinkedList<>();
-		queue.add(new Shelter(1, num));
+	static class Shelter implements Comparable<Shelter> {
+		int height, index;
 
-		int cnt = 0;
-		while (!queue.isEmpty()) {
-			Shelter now = queue.poll();
-//			System.out.println(now);
-
-			for (int next : list[now.index]) {
-				if (ans[next] != 0) { // 이전에 탐색했다면 +1한 값이 최대
-					ans[num] = ans[next] + 1;
-				} else {
-					queue.add(new Shelter(now.cnt + 1, next));
-					cnt = now.cnt + 1;
-				}
-//				System.out.println("next : " + next);
-
-			}
-		}
-		ans[num] = ans[num] < cnt ? cnt : ans[num];
-	}
-
-	static class Shelter {
-		int cnt, index;
-
-		public Shelter(int cnt, int index) {
+		public Shelter(int height, int index) {
 			super();
-			this.cnt = cnt;
+			this.height = height;
 			this.index = index;
+		}
+
+		@Override
+		public int compareTo(Shelter o) {
+			return o.height - this.height;
 		}
 	}
 
