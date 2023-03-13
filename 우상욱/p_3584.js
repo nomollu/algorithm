@@ -1,4 +1,4 @@
-// 가장 가까운 공통 조상
+// G4 가장 가까운 공통 조상
 var fs = require('fs'); 
 var input = fs.readFileSync('input.txt').toString().trim().split('\n');
 
