@@ -16,7 +16,8 @@ public class B4803_트리 {
 			m = Integer.parseInt(st.nextToken());
 			ans = 0;
 			
-			if(n == 0 || m == 0) break;
+			if(n == 0) break;
+			
 			edges = new LinkedList [n+1];
 			visit = new boolean[n+1];
 			parent = new int[n+1];
@@ -35,6 +36,9 @@ public class B4803_트리 {
 				union(a, b);
 			}
 			
+			//부모정점이 최상위 부모가 아닐 수 있어서 한번 더 부모 갱신해주어야 함
+			for(int i=1; i<=n; i++) parent[i] = getParent(i);
+
 			//union을 통해 집합의 루트들만 parentSet에 담음
 			Set<Integer> parentSet = new LinkedHashSet<>();
 			for(int i=1; i<=n; i++) parentSet.add(parent[i]);
@@ -66,7 +70,7 @@ public class B4803_트리 {
 	
 	static boolean dfs(int n, int prev) {
 		for(int i : edges[n]) {
-			if(i == prev || i == n) continue; //n에서 갈 수 있는 간선과 바로 직전 노드가 같을 때, 혹은 1 1과 같은 간선 정보가 주어졌을 때
+			if(i == prev) continue; //n에서 갈 수 있는 간선과 바로 직전 노드가 같을 때, 혹은 1 1과 같은 간선 정보가 주어졌을 때
 			if(visit[i]) return false; //이미 방문했다는건 사이클 존재한다는 의미
 			visit[i] = true;
 			if(!dfs(i, n)) return false;
