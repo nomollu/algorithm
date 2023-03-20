@@ -1,41 +1,63 @@
 import java.util.*;
 
 class Solution {
-    class Arrow{
-        int cnt;
-        List<Integer> select;
-        Arrow(int cnt, List<Integer> select){
-            this.cnt = cnt;
-            this.select = select;
+    int count, max;
+    String order;
+    boolean[] visit;
+    SortedMap<String, Integer> menu_list;
+    
+    static String sort(String s) {
+    	char[] ch = s.toCharArray();
+    	Arrays.sort(ch);
+    	String str = "";
+    	for(char c : ch) str += c;
+    	return str;
+    }
+    
+    void comb(int n, int start){
+        if(n==count){
+            String s = "";
+            for(int i=0; i<visit.length; i++){
+                if (visit[i]) s += order.charAt(i);
+            }
+            if(menu_list.containsKey(s)) {
+            	int cnt = menu_list.get(s)+1;
+            	max = Math.max(max, cnt);
+            	menu_list.replace(s, cnt);
+            }
+            else menu_list.put(s, 1);
+            return;
+        }
+        for(int i=start; i<order.length(); i++){
+            visit[i] = true;
+            comb(n+1, i+1);
+            visit[i] = false;
         }
     }
     
-    public int[] solution(int n, int[] info) {
-        int[] answer = new int[n];
-        
-        int score = 0;
-        for(int i=0; i<=10; i++) score += info[i];
-        
-        int[][] dp = new int[11][score+1];
-        if(info[1]<n) dp[1][1] = info[1]+1;
-        // if(info[1]<n) dp[1][1] = new Arrow(info[1]+1, ;
-        for(int i=2; i<=10; i++){
-            for(int j=0; j<=score; j++){
-                if(j<i) dp[i][j] = dp[i-1][j]; //i점 과녁에 쏘지 않음
-                else if(j==i) {
-                    if (dp[i-1][j]==0) dp[i][j] = info[j];
-                    else dp[i][j] = Math.min(dp[i-1][j], info[j]);
-                }else {
-                    if (dp[i-1][j]==0) dp[i][j] = dp[i][j-i]+dp[i][i];
-                    else dp[i][j] = Math.min(dp[i-1][j], dp[i][j-i]+dp[i][i]);
-                }
-                if(dp[i][j]<n) dp[i][j] = 0;
+    public String[] solution(String[] orders, int[] course) {
+        List<String> ans = new ArrayList<String>();
+		
+        for(int n : course){
+            count = n;
+            max = 0;
+            menu_list = new TreeMap<String, Integer>();
+            for(String od : orders){
+                order = sort(od);
+                int size = order.length();
+                int max = 0;
+                visit = new boolean[size];
+                comb(0, 0);
+            }
+            for(String key : menu_list.keySet()) {
+            	if(menu_list.get(key) == max) ans.add(key);
             }
         }
-        for(int i=1; i<11; i++) if(dp[i][score]!=0) {
-             answer[0] = dp[i][score];
-            return answer;
-        }
+        
+        int size = ans.size();
+        String[] answer = new String[size];
+        for(int i=0; i<size; i++) answer[i] = ans.get(i); 
+        Arrays.sort(answer);
         return answer;
     }
 }
