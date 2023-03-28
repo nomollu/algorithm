@@ -9,22 +9,6 @@ import java.util.StringTokenizer;
 
 public class G1039_change {
 
-// 문제 푸는 방법을 아직 끝까지 떠올리지 못함...
-  
-//	static class Number implements Comparable<Number>{
-//		int value, idx;
-//		Number(int value, int idx){
-//			this.value = value;
-//			this.idx = idx;
-//		}
-//		
-//		@Override
-//		public int compareTo(Number o) {
-//			if(this.value == o.value) return o.idx-this.idx;
-//			else return o.value-this.value;
-//		}
-//	}
-	
 	static int[] number;
 	
 	static int findMax(int start) { //최고값이 있는 자리수 반환
@@ -48,24 +32,25 @@ public class G1039_change {
 		char[] N = st.nextToken().toCharArray();
 		int K = Integer.parseInt(st.nextToken());
 		
-		number = new int[N.length];
-		for(int i=0; i<N.length; i++) number[i] = N[i]-'0';
+		int len = N.length;
+		number = new int[len];
+		for(int i=0; i<len; i++) number[i] = N[i]-'0';
 		
 		int k=0;
 		for(int i=0; i<N.length; i++) {
 			int idx_max = findMax(i);
 			if(idx_max==i) continue;
-			
 			swap(i, idx_max);
-
-			if(++k == K) {
-				while(++i<N.length) {
-					sb.append(number[i]);
-				}
-			}
-			System.out.println(Arrays.toString(number));
+			
+			if(++k==K) break;
 		}
-
 		
-		System.out.println((k==K) ? sb : -1);
+		if(k<K && ((len==2 && number[1]==0) || len==1) ) System.out.println(-1);
+		else {
+			while(++k<=K) {
+				swap(len-2, len-1);
+			}
+			for(int n : number) System.out.print(n);
+		}
 	}
+}
