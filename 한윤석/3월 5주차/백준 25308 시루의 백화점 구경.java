@@ -2,9 +2,10 @@ public class B25307_시루의백화점구경 {
 	
 	static int R,C,K,sr,sc, ans;
 	static int m[][]; //0빈칸, 1벽, 2의자, 3마네킹, 4초기위치
-	static boolean visit [][];
-	static boolean marking[][];
+	static boolean visit [][]; //시루의 방문 여부
+	static boolean marking[][]; //마네킹으로 인해 가지 못하는 칸 
 	static int d[][] = {{1,0},{-1,0},{0,1},{0,-1}};
+	static Queue<int []> mannequins = new LinkedList<>(); //마네킹 위치들
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -23,20 +24,13 @@ public class B25307_시루의백화점구경 {
 				if(m[i][j] == 4) {
 					sr = i;
 					sc = j;
-				}
+				}else if(m[i][j] == 3) mannequins.add(new int [] {i, j, 0});
 			}
 		}
 		
-		for(int i=0; i<R; i++) {
-			for(int j=0; j<C; j++) {
-				if(m[i][j] == 3) markRange(i,j);
-			}
-		}
+		//마네킹으로 인해 접근 불가한 칸을 마킹하는 작업
+		markRange();
 		
-//		for(int i=0; i<R; i++) {
-//			for(int j=0; j<C; j++) System.out.print(m[i][j] + " ");
-//			System.out.println();
-//		}
 		if(bfs()) System.out.println(ans);
 		else System.out.println(-1);
 	}
@@ -58,7 +52,7 @@ public class B25307_시루의백화점구경 {
 				int nr = p[0] + d[i][0];
 				int nc = p[1] + d[i][1];
 				
-				if(nr < 0 || nc < 0 || nr >= R || nc >= C || visit[nr][nc] || m[nr][nc] == 1 || m[nr][nc] == 3) continue;
+				if(nr < 0 || nc < 0 || nr >= R || nc >= C || visit[nr][nc] || m[nr][nc] == 1 || m[nr][nc] == 3 || marking[nr][nc]) continue;
 				
 				visit[nr][nc] = true;
 				q.add(new int [] {nr, nc, p[2]+1});
@@ -68,25 +62,33 @@ public class B25307_시루의백화점구경 {
 		return false;
 	}
 	
-	static void markRange(int r, int c) {
-		marking[r][c] = true;
-		Queue<int []> q = new LinkedList<>();
-		q.add(new int [] {r, c, 0});
-//System.out.println(r + " " + c);
-		while(!q.isEmpty()) {
-			int [] p = q.poll();
-			if(p[2] >= K) continue;
+	static void markRange() {
+		while(!mannequins.isEmpty()) {
+			int size = mannequins.size();
 			
-			for(int i=0; i<4; i++) {
-				int nr = p[0] + d[i][0];
-				int nc = p[1] + d[i][1];
+			/*4 4 2
+			 *0 0 0 4
+			 *2 0 0 0
+			 *0 0 0 3
+			 *0 3 0 0
+			 *과 같은 케이스 통과 위해서 size를 재서 bfs를 돌려야 함!
+			 * */
+			while(size-- > 0) {
+				int [] p = mannequins.poll();
+				marking[p[0]][p[1]] = true;
 				
-//				System.out.println("next" + nr + " " + nc );
-				if(nr < 0 || nc < 0 || nr >= R || nc >= C || m[nr][nc] == 4) continue;
+				if(p[2] >= K) continue;
 				
-				marking[nr][nc] = true;
-				m[nr][nc] = 1;
-				q.add(new int [] {nr, nc, p[2]+1});
+				for(int i=0; i<4; i++) {
+					int nr = p[0] + d[i][0];
+					int nc = p[1] + d[i][1];
+					
+					if(nr < 0 || nc < 0 || nr >= R || nc >= C || marking[nr][nc]) continue;
+					
+					marking[nr][nc] = true;
+					m[nr][nc] = 1;
+					mannequins.add(new int [] {nr, nc, p[2]+1});
+				}
 			}
 		}
 	}
