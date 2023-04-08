@@ -1,7 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class BOJ_Gold3_1039_교환 {
@@ -11,78 +12,53 @@ public class BOJ_Gold3_1039_교환 {
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		String N = st.nextToken();// 숫자
 		int K = Integer.parseInt(st.nextToken());// 연산 수
-		int[] arr = new int[N.length()];
+		boolean[][] visited = new boolean[K + 1][1000001];
 
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = Integer.parseInt(N.charAt(i) + "");
-		}
+		Queue<String> queue = new LinkedList<>();
+		queue.add(N);
 
-		PriorityQueue<Number> max = new PriorityQueue<>();
-		for (int i = 0; i < arr.length; i++) {
-			max.add(new Number(arr[i], i));
-		}
+		while (!queue.isEmpty() && K > 0) {
+			int size = queue.size();
+			for (int s = 0; s < size; s++) {
+				String now = queue.poll();
 
-		boolean flag = false; // 0으로 시작하는지 확인할 변수
-		if (arr.length < 2) { // 길이가 1이면 바꿀게 없으니 안됨
-			flag = true;
-		}
+				for (int i = 0; i < N.length() - 1; i++) {
+					for (int j = i + 1; j < N.length(); j++) {
+						int next = swap(now, i, j);
+						// 맨 앞자리가 0이 아니고 현재 수가 지금 turn에서 방문한 적이 없을때
+						if (next != -1 && !visited[K][next]) {
+							queue.add(String.valueOf(next));
+							visited[K][next] = true;
+						}
+					}
+				}
 
-		int idx = 0;
-		while (!max.isEmpty() && !flag) {
-			Number now = max.poll();
-			int num = arr[idx];
-
-			// max 큐에서 꺼낸 값이 현재 값보다 크고
-			// max 큐에서 꺼낸 값의 인덱스가 현재 인덱스보다 클때
-			if (num < now.value && idx < now.idx && idx < arr.length) {
-				arr[now.idx] = num; // 위치를 바꿔준다
-				arr[idx++] = now.value;
-				K--; // 연산 횟수 감소
-			}
-			if (arr[0] == 0) { // 바꿨는데 맨 앞자리가 0인경우 안됨
-				flag = true;
-				break;
-			}
-
-			if (K == 0) {
-				break;
-			}
-		}
-
-		idx = arr.length - 1;
-		while (K > 0 && !flag) { // 연산횟수가 남아있다면 맨 뒤 2자리를 계속 연산해준다
-			int temp = arr[idx];
-			arr[idx] = arr[idx - 1];
-			arr[idx - 1] = temp;
-			if (arr[0] == 0) { // 맨 앞자리가 0인 경우 안됨
-				flag = true;
-				break;
 			}
 			K--;
 		}
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < arr.length; i++) {
-			sb.append(arr[i]);
+
+		int max = -1;
+		for (String s : queue) { // 큐에 있는 것 중 최대값 뽑기
+			max = Math.max(max, Integer.parseInt(s));
 		}
-		System.out.println(flag ? -1 : sb.toString());
+		System.out.println(max);
 
 	}
 
-	static class Number implements Comparable<Number> {
-		int value, idx;
+	static int swap(String now, int i, int j) {
+		char[] arr = now.toCharArray();
+		char temp = arr[i];
+		arr[i] = arr[j];
+		arr[j] = temp;
 
-		public Number(int value, int idx) {
-			super();
-			this.value = value;
-			this.idx = idx;
+		if (arr[0] == '0') { // 맨 앞이 0이면 안됨
+			return -1;
 		}
 
-		@Override
-		public int compareTo(Number o) {
-			if (this.value == o.value) {
-				return o.idx - this.idx;
-			}
-			return o.value - this.value;
+		String newStr = "";
+		for (char c : arr) {
+			newStr += c + "";
 		}
+		return Integer.parseInt(newStr);
 	}
 }
