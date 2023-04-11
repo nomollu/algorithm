@@ -1,11 +1,10 @@
-public class C_포탑부수기 {
+public class Main {
 	
 	static int R,C,K;
 	static God [][] map;
 	static boolean visit [][];
 	static int d[][] = {{0,1},{1,0},{0,-1},{-1,0},{1,1},{1,-1},{-1,1},{-1,-1}};
 	static God strongest, weakest;
-	static boolean isGodAlone = false;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -20,18 +19,18 @@ public class C_포탑부수기 {
 			for(int j=0; j<C; j++) map[i][j] = new God(i, j, Integer.parseInt(st.nextToken()), 0, false);
 		}
 	
-		while(K-- > 0) {
-			setWeakest();
+		for(int i=1; i<=K; i++) {
+			setWeakest(i);
 			setStrongest();
-			if(isGodAlone) break;
 			attack();
+			if(isGodAlone()) break;
 			store();
 		}
-		printStrongest();
 		
+		printStrongest();
 	}
 	
-	static void setWeakest() {
+	static void setWeakest(int k) {
 		weakest = new God(0, 0, Integer.MAX_VALUE, 0, true);
 		
 		for(int i=0; i<R; i++) {
@@ -40,53 +39,47 @@ public class C_포탑부수기 {
 				
 				if(g.life <= 0) continue;
 				
-				if(g.life < weakest.life) weakest = new God(g.r, g.c, g.life, g.cnt, true);
+				if(g.life < weakest.life) weakest = new God(g.r, g.c, g.life, g.last, true);
 				else if(g.life == weakest.life){
-					if(g.cnt > weakest.cnt) weakest = new God(g.r, g.c, g.life, g.cnt, true);
-					else if(g.cnt == weakest.cnt){
-						if(g.r + g.c > weakest.r + weakest.c) weakest = new God(g.r, g.c, g.life, g.cnt, true);
+					if(g.last > weakest.last) weakest = new God(g.r, g.c, g.life, g.last, true);
+					else if(g.last == weakest.last){
+						if(g.r + g.c > weakest.r + weakest.c) weakest = new God(g.r, g.c, g.life, g.last, true);
 						else if(g.r + g.c == weakest.r + weakest.c){
-							if(g.c > weakest.c) weakest = new God(g.r, g.c, g.life, g.cnt, true);
+							if(g.c > weakest.c) weakest = new God(g.r, g.c, g.life, g.last, true);
 						}
 					}
 				}
-			}
-		}
+			}//end for j
+		} // end for i
 	
+		weakest.life += R + C;
+		weakest.last=k;
+		map[weakest.r][weakest.c] = new God(weakest.r, weakest.c, weakest.life, weakest.last, weakest.isActioned);
 	}
 	
 	static void setStrongest() {
-		strongest = new God(0, 0, 0, 0, true);
+		strongest = new God(0, 0, 0, Integer.MAX_VALUE, true);
 		
 		for(int i=0; i<R; i++) {
 			for(int j=0; j<C; j++) {
-				if(map[i][j].life <= 0) continue;
+				if(map[i][j].life <= 0 || (weakest.r == i && weakest.c == j)) continue;
 				
 				God g = map[i][j];
 				
-				if(g.life > strongest.life) strongest = new God(g.r, g.c, g.life, g.cnt, true);
+				if(g.life > strongest.life) strongest = new God(g.r, g.c, g.life, g.last, true);
 				else if(g.life == strongest.life){
-					if(g.cnt < strongest.cnt) strongest = new God(g.r, g.c, g.life, g.cnt, true);
-					else if(g.cnt == strongest.cnt) {
-						if(g.r + g.c < strongest.r + strongest.c) strongest = new God(g.r, g.c, g.life, g.cnt, true);
+					if(g.last < strongest.last) strongest = new God(g.r, g.c, g.life, g.last, true);
+					else if(g.last == strongest.last) {
+						if(g.r + g.c < strongest.r + strongest.c) strongest = new God(g.r, g.c, g.life, g.last, true);
 						else if(g.r + g.c == strongest.r + strongest.c){
-							if(g.c < strongest.c) strongest = new God(g.r, g.c, g.life, g.cnt, true);
+							if(g.c < strongest.c) strongest = new God(g.r, g.c, g.life, g.last, true);
 						}
 					}
 				}
-			}
-		}
+			} //end for j
+		} // end for i
 		
-		if((strongest.r == weakest.r && strongest.c == weakest.c) || strongest.life == 0) {
-			isGodAlone = true;
-			return;
-		}
-		
-		weakest.life += R + C;
-		weakest.cnt++;
-		strongest.cnt++;
-		map[strongest.r][strongest.c] = new God(strongest.r, strongest.c, strongest.life, strongest.cnt, true);
-		map[weakest.r][weakest.c] = new God(weakest.r, weakest.c, weakest.life, weakest.cnt, true);
+		map[strongest.r][strongest.c] = new God(strongest.r, strongest.c, strongest.life, strongest.last, strongest.isActioned);
 	}
 	
 	static void attack() {
@@ -135,9 +128,9 @@ public class C_포탑부수기 {
 			int r = Integer.parseInt(st.nextToken());
 			int c = Integer.parseInt(st.nextToken());
 			
-			if(!st.hasMoreTokens()) {
+			if(!st.hasMoreTokens()) { //최종 목적지인 경우
 				map[r][c].life -= power;
-			}else map[r][c].life -= power/2;
+			}else map[r][c].life -= power/2; //목적지까지 가는 경로라면
 			
 			map[r][c].isActioned = true;
 		}
@@ -145,9 +138,6 @@ public class C_포탑부수기 {
 	
 	static void bomb() {
 		int power = weakest.life;
-		
-//		System.out.println("bomb start in [" + weakest.r + " ," + weakest.c + "]");
-//		System.out.println("bomb end in [" + strongest.r + " ," + strongest.c + "]");
 		
 		for(int i=0; i<8; i++) {
 			int nr = strongest.r + d[i][0];
@@ -158,6 +148,7 @@ public class C_포탑부수기 {
 			if(nc == C) nc = 0;
 			if(nc == -1) nc = C-1;
 			
+			//벽이거나 나 자신이면 패스
 			if(map[nr][nc].life <= 0 || (nr == weakest.r && nc == weakest.c)) continue;
 			
 			map[nr][nc].life -= power/2;
@@ -172,9 +163,21 @@ public class C_포탑부수기 {
 			for(int j=0; j<C; j++) {
 				if(map[i][j].life <= 0) continue;
 				if(!map[i][j].isActioned) map[i][j].life++;
-				else map[i][j].isActioned = false;
+				map[i][j].isActioned = false;
 			}
 		}
+	}
+	
+	static boolean isGodAlone() {
+		int cnt = 0;
+		
+		for(int i=0; i<R; i++) {
+			for(int j=0; j<C; j++) {
+				if(map[i][j].life > 0) cnt++;
+			}
+		}
+		
+		return cnt <= 1;
 	}
 	
 	static void printStrongest() {
@@ -199,7 +202,6 @@ public class C_포탑부수기 {
 		int r, c;
 		String route;
 		public Route(int r, int c, String route) {
-			super();
 			this.r = r;
 			this.c = c;
 			this.route = route;
@@ -207,13 +209,13 @@ public class C_포탑부수기 {
 	}
 
 	static class God {
-		int r, c, life, cnt;
+		int r, c, life, last;
 		boolean isActioned;
-		public God(int r, int c, int life, int cnt, boolean isActioned) {
+		public God(int r, int c, int life, int last, boolean isActioned) {
 			this.r = r;
 			this.c = c;
 			this.life = life;
-			this.cnt = cnt;
+			this.last = last;
 			this.isActioned = isActioned;
 		}
 	}
