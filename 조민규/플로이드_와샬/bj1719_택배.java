@@ -21,7 +21,7 @@ public class bj1719_택배 {
         for(int i = 1 ; i <= N ; i++){
             for(int j = 1 ; j <= N ; j++){
                 if(i == j) continue;
-                adjMatrix[i][j] = Integer.MAX_VALUE;
+                adjMatrix[i][j] = 200 * 10000 + 1;
                 ans[i][j] = j;
             }
         }
@@ -33,16 +33,16 @@ public class bj1719_택배 {
             int w = Integer.parseInt(st.nextToken());
             adjMatrix[a][b] = w;
             adjMatrix[b][a] = w;
+            ans[a][b] = b;
+            ans[b][a] = a;
         }
 
         for(int k = 1 ; k <= N ; k++){
             for(int i = 1 ; i <= N ; i++){
-                if(i == k) continue; // 출발지와 경유지가 같을 경우
                 for(int j = 1 ; j <= N ; j++){
-                    if(i == j || k == j) continue; // 출발지와 도착지가 같을 경우, 경유지와 도착지가 같을 경우
                     if(adjMatrix[i][j] > adjMatrix[i][k] + adjMatrix[k][j]){ // 경유하는 게 더 빨리 갈 경우
                         adjMatrix[i][j] = adjMatrix[i][k] + adjMatrix[k][j];
-                        ans[i][j] = k;
+                        ans[i][j] = ans[i][k];
                     }
                 }
             }
