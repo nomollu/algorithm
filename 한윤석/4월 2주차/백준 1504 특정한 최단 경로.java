@@ -2,7 +2,7 @@ public class B1504_특정한최단경로 {
 
 	static int N, E;
 	static List<Edge> edges [];
-	static final int INF = 1000000000;
+	static final int INF = 1000000000; //Integer.maxvalue 하면 오버플로우 남
 	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -40,7 +40,7 @@ public class B1504_특정한최단경로 {
 		Arrays.fill(v1d, INF);
 		Arrays.fill(v2d, INF);
 		Arrays.fill(nd, INF);
-		v1d[1] = 0;
+		v1d[1] = 0; //0으로 시작점 초기화 안 해주면 v1 = 1일 때 
 		v2d[v1] = 0;
 		nd[v2] = 0;
 
@@ -55,7 +55,7 @@ public class B1504_특정한최단경로 {
 				if(v1d[ne.to] <= ne.d + e.d) continue;
 				
 				v1d[ne.to] = ne.d + e.d;
-				pq.add(new Edge(e.to, v1d[ne.to]));
+				pq.add(new Edge(ne.to, v1d[ne.to]));
 			}
 		}
 		
@@ -72,7 +72,7 @@ public class B1504_특정한최단경로 {
 				if(v2d[ne.to] <= ne.d + e.d) continue;
 				
 				v2d[ne.to] = ne.d + e.d;
-				pq.add(new Edge(e.to, v2d[ne.to]));
+				pq.add(new Edge(ne.to, v2d[ne.to]));
 			}
 		}
 		
@@ -85,12 +85,10 @@ public class B1504_특정한최단경로 {
 			if(nd[e.to] < e.d) continue;
 			
 			for(Edge ne : edges[e.to]) {
-//				System.out.println("e.to : " + e.to + " e.d : " + e.d + " ne.to : " + ne.to + " ne.d : " + ne.d + " nd[ne.to] : " + nd[ne.to]);
 				if(nd[ne.to] <= ne.d + e.d) continue;
 				
 				nd[ne.to] = ne.d + e.d;
 				pq.add(new Edge(ne.to, nd[ne.to]));
-//				System.out.println(" nd[ne.to] : " + nd[ne.to] + " " + pq.size());
 			}
 		}
 		
