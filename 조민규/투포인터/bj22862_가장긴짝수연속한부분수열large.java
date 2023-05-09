@@ -39,6 +39,7 @@ public class bj22862_가장긴짝수연속한부분수열large {
             if(isEven(S[left])){
 
                 // cnt, right, ignoreCnt 초기화
+                int secondEvenIndex = 0;
                 cnt = 0;
                 right = left;
                 int ignoreCnt = K; // 홀수를 무시할 수 있는 남은 횟수
@@ -47,6 +48,9 @@ public class bj22862_가장긴짝수연속한부분수열large {
                 while(right < N){
                     if(isEven(S[right])){ // right 포인터가 짝수
                         cnt++;
+                        if(left != right && secondEvenIndex == 0){
+                            secondEvenIndex = right;
+                        }
                     } else { // right 포인터가 홀수
                         if(ignoreCnt == 0) {
                             break;
@@ -64,8 +68,14 @@ public class bj22862_가장긴짝수연속한부분수열large {
                 ans = Math.max(ans, cnt);
 
                 // left와 right 포인터 위치 정렬
-                right++;
-                left = right;
+                if(secondEvenIndex == 0){
+                    right++;
+                    left = right;
+                } else {
+                    left = secondEvenIndex;
+                    right = left;
+                }
+
             }
         }
 
