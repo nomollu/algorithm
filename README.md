@@ -1,9 +1,12 @@
 # ❓ 몰?루는게 없을 5인의 알고리즘 스터디
 > Since 23.01.10
 <br/>
-<img src="https://media.tenor.com/ueeUXv9zsR0AAAAM/ukelele-music.gif" width="250">
+<div align="center">
+<img src="https://media.tenor.com/ueeUXv9zsR0AAAAM/ukelele-music.gif" width="250" >
 
 ### ` 🌊 23.08.01 COMING SOON ! `
+  
+</div>
 <br/>
 
 ## :runner: MEMBERS
