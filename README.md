@@ -2,9 +2,7 @@
 > Since 23.01.10
 <br/>
 <div align="center">
-<img src="https://media.tenor.com/ueeUXv9zsR0AAAAM/ukelele-music.gif" width="250" >
 
-### ` 🌊 23.08.01 COMING SOON ! `
   
 </div>
 <br/>
